@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Blackjack
-  CARD_NAME_TO_NUMBER_MAPPING = {
+  CARD_VALUES = {
     "one" => 1,
     "two" => 2,
     "three" => 3,
@@ -19,17 +19,17 @@ module Blackjack
   }.freeze
 
   def self.parse_card(card)
-    CARD_NAME_TO_NUMBER_MAPPING[card] || 0
+    CARD_VALUES[card] || 0
   end
 
   def self.card_range(card1, card2)
-    range = parse_card(card1) + parse_card(card2)
-    case range
-    when (4..11)
+    score = parse_card(card1) + parse_card(card2)
+    case score
+    when 4..11
       "low"
-    when (12..16)
+    when 12..16
       "mid"
-    when (17..20)
+    when 17..20
       "high"
     when 21
       "blackjack"
@@ -37,15 +37,16 @@ module Blackjack
   end
 
   def self.first_turn(card1, card2, dealer_card)
-    if card1 == "ace" && card2 == "ace"
-      "P"
-    elsif card_range(card1, card2) == "high"
+    card_range = card_range(card1, card2)
+    return "P" if card1 == "ace" && card2 == "ace"
+    case card_range(card1, card2)
+    when "high"
       "S"
-    elsif card_range(card1, card2) == "low"
-      "H"
-    elsif card_range(card1, card2) == "mid"
+    when "mid"
       parse_card(dealer_card) < 7 ? "S" : "H"
-    elsif card_range(card1, card2) == "blackjack"
+    when "low"
+      "H"
+    when "blackjack"
       [10, 11].include?(parse_card(dealer_card)) ? "S" : "W"
     end
   end
